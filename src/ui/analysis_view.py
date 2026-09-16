@@ -333,22 +333,58 @@ class AnalysisView(QWidget):
         self._result_table.setItem(row, 1, QTableWidgetItem(value))
 
     def _fill_ecg_result(self, r: ECGResult):
+        # 基本信息
         self._add_result_row("平均心率", f"{r.heart_rate:.1f} bpm")
         self._add_result_row("心搏数", str(r.n_beats))
+
+        # ── 时域指标 1-8 ──
+        self._add_result_row("【时域指标】", "")
+        if r.mean_nn is not None:
+            self._add_result_row("1. MeanNN 平均NN间期", f"{r.mean_nn:.2f} ms")
         if r.sdnn is not None:
-            self._add_result_row("SDNN", f"{r.sdnn:.2f} ms")
+            self._add_result_row("2. SDNN 全部NN标准差", f"{r.sdnn:.2f} ms")
         if r.rmssd is not None:
-            self._add_result_row("RMSSD", f"{r.rmssd:.2f} ms")
+            self._add_result_row("3. RMSSD 相邻NN差均方根", f"{r.rmssd:.2f} ms")
         if r.pnn50 is not None:
-            self._add_result_row("pNN50", f"{r.pnn50:.2f} %")
-        if r.mean_rr is not None:
-            self._add_result_row("平均RR", f"{r.mean_rr:.2f} ms")
-        if r.lf_power is not None:
-            self._add_result_row("LF 功率", f"{r.lf_power:.2f} ms^2")
-        if r.hf_power is not None:
-            self._add_result_row("HF 功率", f"{r.hf_power:.2f} ms^2")
+            self._add_result_row("4. pNN50 相邻NN差>50ms占比", f"{r.pnn50:.2f} %")
+        if r.sdsd is not None:
+            self._add_result_row("5. SDSD 相邻NN差标准差", f"{r.sdsd:.2f} ms")
+        if r.sdann is not None:
+            self._add_result_row("6. SDANN 5min均值标准差", f"{r.sdann:.2f} ms")
+        if r.sdnni is not None:
+            self._add_result_row("7. SDNNI 5min SDNN均值", f"{r.sdnni:.2f} ms")
+        if r.pnn20 is not None:
+            self._add_result_row("8. pNN20 相邻NN差>20ms占比", f"{r.pnn20:.2f} %")
+
+        # ── 频域指标 9-14 ──
+        self._add_result_row("【频域指标】", "")
+        if r.tp is not None:
+            self._add_result_row("9. TP 总功率", f"{r.tp:.2f} ms^2")
+        if r.hf is not None:
+            self._add_result_row("10. HF 高频(0.15-0.4Hz)", f"{r.hf:.2f} ms^2")
+        if r.lf is not None:
+            self._add_result_row("11. LF 低频(0.04-0.15Hz)", f"{r.lf:.2f} ms^2")
         if r.lf_hf_ratio is not None:
-            self._add_result_row("LF/HF", f"{r.lf_hf_ratio:.2f}")
+            self._add_result_row("12. LF/HF 比值", f"{r.lf_hf_ratio:.2f}")
+        if r.vlf is not None:
+            self._add_result_row("13. VLF 极低频(0.0033-0.04Hz)", f"{r.vlf:.2f} ms^2")
+        if r.ulf is not None:
+            self._add_result_row("14. ULF 超低频(<0.0033Hz)", f"{r.ulf:.2f} ms^2")
+
+        # ── 非线性指标 15-20 ──
+        self._add_result_row("【非线性指标】", "")
+        if r.sd1 is not None:
+            self._add_result_row("15. SD1 Poincare短时波动", f"{r.sd1:.2f} ms")
+        if r.sd2 is not None:
+            self._add_result_row("16. SD2 Poincare长期波动", f"{r.sd2:.2f} ms")
+        if r.sd1sd2 is not None:
+            self._add_result_row("17. SD1/SD2 比值", f"{r.sd1sd2:.2f}")
+        if r.sampen is not None:
+            self._add_result_row("18. SampEn 样本熵", f"{r.sampen:.4f}")
+        if r.apen is not None:
+            self._add_result_row("19. ApEn 近似熵", f"{r.apen:.4f}")
+        if r.dfa_alpha1 is not None:
+            self._add_result_row("20. DFA α1 短程标度指数", f"{r.dfa_alpha1:.4f}")
 
     def _fill_emg_result(self, r: EMGResult):
         self._add_result_row("RMS", f"{r.rms:.4f} mV")
@@ -654,8 +690,23 @@ class PhaseComparisonDialog(QDialog):
     # 用于横向对比的关键指标提取器
     _METRIC_EXTRACTORS = {
         "ECG":  lambda r: {"心率(bpm)": r.heart_rate,
+                            "MeanNN(ms)": r.mean_nn if r.mean_nn is not None else float("nan"),
                             "SDNN(ms)": r.sdnn if r.sdnn is not None else float("nan"),
                             "RMSSD(ms)": r.rmssd if r.rmssd is not None else float("nan"),
+                            "pNN50(%)": r.pnn50 if r.pnn50 is not None else float("nan"),
+                            "SDSD(ms)": r.sdsd if r.sdsd is not None else float("nan"),
+                            "pNN20(%)": r.pnn20 if r.pnn20 is not None else float("nan"),
+                            "TP(ms^2)": r.tp if r.tp is not None else float("nan"),
+                            "HF(ms^2)": r.hf if r.hf is not None else float("nan"),
+                            "LF(ms^2)": r.lf if r.lf is not None else float("nan"),
+                            "LF/HF": r.lf_hf_ratio if r.lf_hf_ratio is not None else float("nan"),
+                            "VLF(ms^2)": r.vlf if r.vlf is not None else float("nan"),
+                            "SD1(ms)": r.sd1 if r.sd1 is not None else float("nan"),
+                            "SD2(ms)": r.sd2 if r.sd2 is not None else float("nan"),
+                            "SD1/SD2": r.sd1sd2 if r.sd1sd2 is not None else float("nan"),
+                            "SampEn": r.sampen if r.sampen is not None else float("nan"),
+                            "ApEn": r.apen if r.apen is not None else float("nan"),
+                            "DFA_α1": r.dfa_alpha1 if r.dfa_alpha1 is not None else float("nan"),
                             "心搏数": float(r.n_beats)},
         "EMG":  lambda r: {"RMS(mV)": r.rms,
                             "MNF(Hz)": r.mean_freq,

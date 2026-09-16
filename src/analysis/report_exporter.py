@@ -24,24 +24,54 @@ from ..device.sensor_types import get_sensor_meta, SENSOR_META
 
 
 def _extract_ecg(r) -> dict:
+    """ECG Top 20 HRV 指标提取（参考 ESC/NASPE 标准）。"""
     d = {
         "平均心率(bpm)": r.heart_rate,
         "心搏数": r.n_beats,
     }
+    # ── 时域 1-8 ──
+    if r.mean_nn is not None:
+        d["1.MeanNN(ms)"] = r.mean_nn
     if r.sdnn is not None:
-        d["SDNN(ms)"] = r.sdnn
+        d["2.SDNN(ms)"] = r.sdnn
     if r.rmssd is not None:
-        d["RMSSD(ms)"] = r.rmssd
+        d["3.RMSSD(ms)"] = r.rmssd
     if r.pnn50 is not None:
-        d["pNN50(%)"] = r.pnn50
-    if r.mean_rr is not None:
-        d["平均RR(ms)"] = r.mean_rr
-    if r.lf_power is not None:
-        d["LF功率(ms^2)"] = r.lf_power
-    if r.hf_power is not None:
-        d["HF功率(ms^2)"] = r.hf_power
+        d["4.pNN50(%)"] = r.pnn50
+    if r.sdsd is not None:
+        d["5.SDSD(ms)"] = r.sdsd
+    if r.sdann is not None:
+        d["6.SDANN(ms)"] = r.sdann
+    if r.sdnni is not None:
+        d["7.SDNNI(ms)"] = r.sdnni
+    if r.pnn20 is not None:
+        d["8.pNN20(%)"] = r.pnn20
+    # ── 频域 9-14 ──
+    if r.tp is not None:
+        d["9.TP(ms^2)"] = r.tp
+    if r.hf is not None:
+        d["10.HF(ms^2)"] = r.hf
+    if r.lf is not None:
+        d["11.LF(ms^2)"] = r.lf
     if r.lf_hf_ratio is not None:
-        d["LF/HF"] = r.lf_hf_ratio
+        d["12.LF/HF"] = r.lf_hf_ratio
+    if r.vlf is not None:
+        d["13.VLF(ms^2)"] = r.vlf
+    if r.ulf is not None:
+        d["14.ULF(ms^2)"] = r.ulf
+    # ── 非线性 15-20 ──
+    if r.sd1 is not None:
+        d["15.SD1(ms)"] = r.sd1
+    if r.sd2 is not None:
+        d["16.SD2(ms)"] = r.sd2
+    if r.sd1sd2 is not None:
+        d["17.SD1/SD2"] = r.sd1sd2
+    if r.sampen is not None:
+        d["18.SampEn"] = r.sampen
+    if r.apen is not None:
+        d["19.ApEn"] = r.apen
+    if r.dfa_alpha1 is not None:
+        d["20.DFA_a1"] = r.dfa_alpha1
     return d
 
 
