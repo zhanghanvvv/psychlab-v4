@@ -111,6 +111,22 @@ def analyze_ecg(ecg_signal: np.ndarray, sampling_rate: int = 1000) -> ECGResult:
                 return None
 
         # ── 时域分析（1-8）──
+        # 注意：neurokit2 >=0.2.x 将 SDANN/SDNNI 按片段长度拆成 SDANN1/SDANN2/SDANN5
+        # （分别对应 1min/2min/5min 片段），需要做多候选回退
+        def _get_sd_ann(df):
+            for col in ("HRV_SDANN5", "HRV_SDANN2", "HRV_SDANN1", "HRV_SDANN"):
+                v = _get(df, col)
+                if v is not None:
+                    return v
+            return None
+
+        def _get_sd_nni(df):
+            for col in ("HRV_SDNNI5", "HRV_SDNNI2", "HRV_SDNNI1", "HRV_SDNNI"):
+                v = _get(df, col)
+                if v is not None:
+                    return v
+            return None
+
         try:
             hrv_time = nk.hrv_time(info, sampling_rate=sampling_rate, show=False)
             result.mean_nn  = _get(hrv_time, "HRV_MeanNN")
@@ -118,8 +134,8 @@ def analyze_ecg(ecg_signal: np.ndarray, sampling_rate: int = 1000) -> ECGResult:
             result.rmssd    = _get(hrv_time, "HRV_RMSSD")
             result.pnn50    = _get(hrv_time, "HRV_pNN50")
             result.sdsd     = _get(hrv_time, "HRV_SDSD")
-            result.sdann    = _get(hrv_time, "HRV_SDANN")
-            result.sdnni    = _get(hrv_time, "HRV_SDNNI")
+            result.sdann    = _get_sd_ann(hrv_time)
+            result.sdnni    = _get_sd_nni(hrv_time)
             result.pnn20    = _get(hrv_time, "HRV_pNN20")
         except Exception as e:
             logger.warning(f"HRV 时域分析失败: {e}")
