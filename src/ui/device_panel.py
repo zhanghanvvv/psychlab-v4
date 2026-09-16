@@ -202,21 +202,25 @@ class DevicePanel(QWidget):
         # ── 采集控制 ──
         ctrl_row = QHBoxLayout()
         self._start_btn = QPushButton("开始采集")
-        self._start_btn.setMinimumHeight(40)
+        self._start_btn.setMinimumHeight(44)
         self._start_btn.setStyleSheet(
-            "QPushButton { background-color: #27ae60; color: white; "
-            "font-size: 14px; font-weight: bold; }"
-            "QPushButton:hover { background-color: #229954; }"
+            "QPushButton { background-color: #1976d2; color: white; "
+            "font-size: 16px; font-weight: bold; border: none; border-radius: 6px; }"
+            "QPushButton:hover { background-color: #2196f3; }"
+            "QPushButton:pressed { background-color: #0d47a1; }"
+            "QPushButton:disabled { background-color: #c5d4ec; color: #7f8c8d; }"
         )
         self._start_btn.clicked.connect(self._on_start_acquisition)
         ctrl_row.addWidget(self._start_btn)
 
         self._stop_btn = QPushButton("停止采集")
-        self._stop_btn.setMinimumHeight(40)
+        self._stop_btn.setMinimumHeight(44)
         self._stop_btn.setStyleSheet(
-            "QPushButton { background-color: #e74c3c; color: white; "
-            "font-size: 14px; font-weight: bold; }"
-            "QPushButton:hover { background-color: #c0392b; }"
+            "QPushButton { background-color: #c0392b; color: white; "
+            "font-size: 16px; font-weight: bold; border: none; border-radius: 6px; }"
+            "QPushButton:hover { background-color: #e74c3c; }"
+            "QPushButton:pressed { background-color: #922b21; }"
+            "QPushButton:disabled { background-color: #e6cecc; color: #7f8c8d; }"
         )
         self._stop_btn.clicked.connect(self._on_stop_acquisition)
         ctrl_row.addWidget(self._stop_btn)

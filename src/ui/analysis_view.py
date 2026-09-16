@@ -131,16 +131,16 @@ class AnalysisView(QWidget):
 
         # 上：原始波形
         self._plot_widget = pg.GraphicsLayoutWidget()
-        self._plot_widget.setBackground("k")
+        self._plot_widget.setBackground("w")
         self._waveform_plot = self._plot_widget.addPlot()
         self._waveform_plot.showGrid(x=True, y=True, alpha=0.3)
-        self._waveform_plot.setLabel("left", "振幅")
-        self._waveform_plot.setLabel("bottom", "时间 (秒)")
+        self._waveform_plot.setLabel("left", "振幅", color="#1a3a6b")
+        self._waveform_plot.setLabel("bottom", "时间 (秒)", color="#1a3a6b")
         splitter.addWidget(self._plot_widget)
 
         # 中：分析图表
         self._artifact_widget = pg.GraphicsLayoutWidget()
-        self._artifact_widget.setBackground("k")
+        self._artifact_widget.setBackground("w")
         splitter.addWidget(self._artifact_widget)
 
         # 下：结果表格
@@ -250,7 +250,7 @@ class AnalysisView(QWidget):
         time_axis = np.linspace(start / fs, end / fs, len(data))
 
         self._waveform_plot.clear()
-        self._waveform_plot.plot(time_axis, data, pen=pg.mkPen("c", width=1.5))
+        self._waveform_plot.plot(time_axis, data, pen=pg.mkPen("b", width=1.5))
 
         meta = get_sensor_meta(stype)
         if meta.y_range:
@@ -428,22 +428,22 @@ class AnalysisView(QWidget):
         """在分析图表区创建一个子图。"""
         p = self._artifact_widget.addPlot(row=row, col=col)
         p.showGrid(x=True, y=True, alpha=0.3)
-        p.setTitle(title, color="w")
+        p.setTitle(title, color="#1a3a6b")
         return p
 
     def _plot_ecg_artifacts(self, r: ECGResult, data: np.ndarray,
                              time_axis: np.ndarray, fs: int):
         # 子图1: 波形 + R 波标记
         p1 = self._new_artifact_plot("ECG 波形 + R 波标记", 0, 0)
-        p1.plot(time_axis, data, pen=pg.mkPen("c", width=1))
+        p1.plot(time_axis, data, pen=pg.mkPen("b", width=1))
         if r.peaks_idx is not None and len(r.peaks_idx) > 0:
             peak_t = time_axis[r.peaks_idx]
             peak_v = data[r.peaks_idx]
             p1.plot(peak_t, peak_v, pen=None,
                     symbol="o", symbolSize=10,
                     symbolBrush="r", symbolPen="r")
-        p1.setLabel("left", "振幅")
-        p1.setLabel("bottom", "时间 (秒)")
+        p1.setLabel("left", "振幅", color="#1a3a6b")
+        p1.setLabel("bottom", "时间 (秒)", color="#1a3a6b")
 
         # 子图2: HRV 散点图（RR 间期序列）
         p2 = self._new_artifact_plot("HRV 散点 (RR 间期)", 0, 1)
@@ -453,9 +453,9 @@ class AnalysisView(QWidget):
             p2.plot(idx, rr_ms, pen=None, symbol="o",
                     symbolSize=5, symbolBrush="g")
             mean_rr = float(np.mean(rr_ms))
-            p2.addLine(y=mean_rr, pen=pg.mkPen("y", width=1, style=Qt.DashLine))
+            p2.addLine(y=mean_rr, pen=pg.mkPen("#ff8c00", width=1, style=Qt.DashLine))
         else:
-            p2.setTitle("HRV 散点 (无 R 波检测)", color="r")
+            p2.setTitle("HRV 散点 (无 R 波检测)", color="#c0392b")
         p2.setLabel("left", "RR (ms)")
         p2.setLabel("bottom", "心搏序号")
 
@@ -463,11 +463,11 @@ class AnalysisView(QWidget):
                              time_axis: np.ndarray, fs: int):
         # 子图1: 包络曲线
         p1 = self._new_artifact_plot("EMG 包络 (RMS 滑窗)", 0, 0)
-        p1.plot(time_axis, data, pen=pg.mkPen("c", width=0.5, style=Qt.DashLine))
+        p1.plot(time_axis, data, pen=pg.mkPen("b", width=0.5, style=Qt.DashLine))
         if r.envelope is not None and len(r.envelope) == len(data):
-            p1.plot(time_axis, r.envelope, pen=pg.mkPen("y", width=2))
-        p1.setLabel("left", "振幅 (mV)")
-        p1.setLabel("bottom", "时间 (秒)")
+            p1.plot(time_axis, r.envelope, pen=pg.mkPen("#ff8c00", width=2))
+        p1.setLabel("left", "振幅 (mV)", color="#1a3a6b")
+        p1.setLabel("bottom", "时间 (秒)", color="#1a3a6b")
 
         # 子图2: 频谱图
         p2 = self._new_artifact_plot("EMG 频谱 (Welch)", 0, 1)
@@ -479,18 +479,18 @@ class AnalysisView(QWidget):
             p2.addLine(x=r.mean_freq, pen=pg.mkPen("g", width=1, style=Qt.DashLine),
                         label=f"MNF={r.mean_freq:.1f}Hz")
         if r.median_freq > 0:
-            p2.addLine(x=r.median_freq, pen=pg.mkPen("y", width=1, style=Qt.DashLine),
+            p2.addLine(x=r.median_freq, pen=pg.mkPen("#ff8c00", width=1, style=Qt.DashLine),
                         label=f"MDF={r.median_freq:.1f}Hz")
-        p2.setLabel("left", "PSD")
-        p2.setLabel("bottom", "频率 (Hz)")
+        p2.setLabel("left", "PSD", color="#1a3a6b")
+        p2.setLabel("bottom", "频率 (Hz)", color="#1a3a6b")
 
     def _plot_eda_artifacts(self, r: EDAResult, data: np.ndarray,
                              time_axis: np.ndarray, fs: int):
         # 子图1: SCL 趋势 + 原始
         p1 = self._new_artifact_plot("EDA: SCL 趋势 + SCR 事件", 0, 0)
-        p1.plot(time_axis, data, pen=pg.mkPen("c", width=1), name="Raw")
+        p1.plot(time_axis, data, pen=pg.mkPen("b", width=1), name="Raw")
         if r.scl_trend is not None and len(r.scl_trend) == len(data):
-            p1.plot(time_axis, r.scl_trend, pen=pg.mkPen("y", width=2), name="SCL")
+            p1.plot(time_axis, r.scl_trend, pen=pg.mkPen("#ff8c00", width=2), name="SCL")
         # 标记 SCR 峰
         if len(r.scr_onsets) > 0:
             onset_idx = (r.scr_onsets * fs).astype(int)
@@ -499,8 +499,8 @@ class AnalysisView(QWidget):
                 p1.plot(time_axis[onset_idx], data[onset_idx],
                         pen=None, symbol="o", symbolSize=10,
                         symbolBrush="r", symbolPen="r")
-        p1.setLabel("left", "EDA (uS)")
-        p1.setLabel("bottom", "时间 (秒)")
+        p1.setLabel("left", "EDA (uS)", color="#1a3a6b")
+        p1.setLabel("bottom", "时间 (秒)", color="#1a3a6b")
 
         # 子图2: SCR 振幅柱状图
         p2 = self._new_artifact_plot("SCR 事件振幅", 0, 1)
@@ -511,27 +511,27 @@ class AnalysisView(QWidget):
                 width=0.6, brush="g"
             )
             p2.addItem(bg)
-            p2.setLabel("left", "振幅 (uS)")
-            p2.setLabel("bottom", "SCR 序号")
+            p2.setLabel("left", "振幅 (uS)", color="#1a3a6b")
+            p2.setLabel("bottom", "SCR 序号", color="#1a3a6b")
         else:
-            p2.setTitle("无 SCR 事件", color="r")
+            p2.setTitle("无 SCR 事件", color="#c0392b")
 
     def _plot_eeg_artifacts(self, r: EEGResult, data: np.ndarray,
                              time_axis: np.ndarray, fs: int):
         # 子图1: PSD 频谱
         p1 = self._new_artifact_plot("EEG 功率谱密度 (PSD)", 0, 0)
         if len(r.freqs) > 0 and len(r.psd) > 0:
-            p1.plot(r.freqs, r.psd, pen=pg.mkPen("c", width=1.5))
+            p1.plot(r.freqs, r.psd, pen=pg.mkPen("b", width=1.5))
             # 标注频带分界
             for band_name, (low, high) in [
                 ("δ", (0.5, 4.0)), ("θ", (4.0, 8.0)),
                 ("α", (8.0, 13.0)), ("β", (13.0, 30.0)),
                 ("γ", (30.0, 50.0))
             ]:
-                p1.addLine(x=low, pen=pg.mkPen("y", width=0.5, style=Qt.DotLine))
+                p1.addLine(x=low, pen=pg.mkPen("#ff8c00", width=0.5, style=Qt.DotLine))
         p1.setLogY(True, None)
-        p1.setLabel("left", "PSD (uV^2/Hz)")
-        p1.setLabel("bottom", "频率 (Hz)")
+        p1.setLabel("left", "PSD (uV^2/Hz)", color="#1a3a6b")
+        p1.setLabel("bottom", "频率 (Hz)", color="#1a3a6b")
 
         # 子图2: 5 频带功率柱状图
         p2 = self._new_artifact_plot("EEG 频带绝对功率", 0, 1)
@@ -546,14 +546,14 @@ class AnalysisView(QWidget):
             p2.addItem(bg)
             ticks = [(i + 1, b) for i, b in enumerate(bands)]
             p2.getAxis("bottom").setTicks([ticks])
-            p2.setLabel("left", "功率 (uV^2)")
+            p2.setLabel("left", "功率 (uV^2)", color="#1a3a6b")
         else:
-            p2.setTitle("无频带功率", color="r")
+            p2.setTitle("无频带功率", color="#c0392b")
 
     def _plot_resp_artifacts(self, r: RespirationResult, data: np.ndarray,
                               time_axis: np.ndarray, fs: int):
         p1 = self._new_artifact_plot("呼吸: 峰(吸气)/谷(呼气) 标记", 0, 0)
-        p1.plot(time_axis, data, pen=pg.mkPen("c", width=1.5))
+        p1.plot(time_axis, data, pen=pg.mkPen("b", width=1.5))
         if r.peaks is not None and len(r.peaks) > 0:
             peak_t = time_axis[r.peaks]
             peak_v = data[r.peaks]
@@ -564,25 +564,25 @@ class AnalysisView(QWidget):
             tr_v = data[r.troughs]
             p1.plot(tr_t, tr_v, pen=None, symbol="v",
                     symbolSize=10, symbolBrush="r", symbolPen="r")
-        p1.setLabel("left", "振幅")
-        p1.setLabel("bottom", "时间 (秒)")
+        p1.setLabel("left", "振幅", color="#1a3a6b")
+        p1.setLabel("bottom", "时间 (秒)", color="#1a3a6b")
 
         # 子图2: 瞬时呼吸频率
         p2 = self._new_artifact_plot("瞬时呼吸频率", 0, 1)
         if r.rate_series is not None and len(r.rate_series) > 0:
             x = np.arange(1, len(r.rate_series) + 1)
-            p2.plot(x, r.rate_series, pen=pg.mkPen("y", width=2),
+            p2.plot(x, r.rate_series, pen=pg.mkPen("#ff8c00", width=2),
                     symbol="o", symbolSize=5)
         else:
-            p2.setTitle("无法计算瞬时频率", color="r")
-        p2.setLabel("left", "频率 (次/分)")
-        p2.setLabel("bottom", "呼吸周期序号")
+            p2.setTitle("无法计算瞬时频率", color="#c0392b")
+        p2.setLabel("left", "频率 (次/分)", color="#1a3a6b")
+        p2.setLabel("bottom", "呼吸周期序号", color="#1a3a6b")
 
     def _plot_generic_artifacts(self, data: np.ndarray, time_axis: np.ndarray):
         p1 = self._new_artifact_plot("信号波形", 0, 0)
-        p1.plot(time_axis, data, pen=pg.mkPen("c", width=1.5))
-        p1.setLabel("left", "振幅")
-        p1.setLabel("bottom", "时间 (秒)")
+        p1.plot(time_axis, data, pen=pg.mkPen("b", width=1.5))
+        p1.setLabel("left", "振幅", color="#1a3a6b")
+        p1.setLabel("bottom", "时间 (秒)", color="#1a3a6b")
 
     # ────────────────────────────── 对比模式 ──────────────────────────────
 
@@ -766,12 +766,12 @@ class PhaseComparisonDialog(QDialog):
 
         # 对比柱状图
         self._plot_widget = pg.GraphicsLayoutWidget()
-        self._plot_widget.setBackground("k")
+        self._plot_widget.setBackground("w")
         self._bar_plot = self._plot_widget.addPlot()
         self._bar_plot.showGrid(x=True, y=True, alpha=0.3)
-        self._bar_plot.setLabel("left", "数值")
-        self._bar_plot.setLabel("bottom", "阶段")
-        self._bar_plot.setTitle("三态指标对比", color="w")
+        self._bar_plot.setLabel("left", "数值", color="#1a3a6b")
+        self._bar_plot.setLabel("bottom", "阶段", color="#1a3a6b")
+        self._bar_plot.setTitle("三态指标对比", color="#1a3a6b")
         splitter.addWidget(self._plot_widget)
 
         # 对比表
@@ -887,11 +887,11 @@ class PhaseComparisonDialog(QDialog):
                                        (np.isnan(val) or np.isinf(val)))
                                else float(val))
             x = np.arange(len(phases)) + 1
-            bg = pg.BarGraphItem(x=x, height=heights, width=0.6, brush="c")
+            bg = pg.BarGraphItem(x=x, height=heights, width=0.6, brush="b")
             self._bar_plot.addItem(bg)
             ticks = [(i + 1, p) for i, p in enumerate(phases)]
             self._bar_plot.getAxis("bottom").setTicks([ticks])
-            self._bar_plot.setTitle(f"{metric_names[0]} - 三态对比", color="w")
+            self._bar_plot.setTitle(f"{metric_names[0]} - 三态对比", color="#1a3a6b")
 
     @staticmethod
     def _analyze_by_type(stype: str, data: np.ndarray, fs: int):

@@ -132,7 +132,7 @@ class DataStreamView(QWidget):
         self._lbl_dropped = QLabel("0")
         self._lbl_channels = QLabel("0")
 
-        big = "font-size: 15px; font-weight: bold; color: #2c3e50;"
+        big = "font-size: 18px; font-weight: bold; color: #1976d2;"
         for lbl in (self._lbl_elapsed, self._lbl_frames, self._lbl_fps,
                     self._lbl_nominal, self._lbl_dropped, self._lbl_channels):
             lbl.setStyleSheet(big)
@@ -148,7 +148,7 @@ class DataStreamView(QWidget):
         for col, (title, value) in enumerate(items):
             box = QVBoxLayout()
             t = QLabel(title)
-            t.setStyleSheet("color: #7f8c8d;")
+            t.setStyleSheet("color: #5a7191; font-size: 13px; font-weight: bold;")
             box.addWidget(t)
             box.addWidget(value)
             grid.addLayout(box, 0, col)
@@ -174,7 +174,8 @@ class DataStreamView(QWidget):
         self._log_view.setReadOnly(True)
         self._log_view.setMaximumBlockCount(500)
         self._log_view.setStyleSheet(
-            "QPlainTextEdit { font-family: Consolas, monospace; font-size: 12px; }"
+            "QPlainTextEdit { font-family: Consolas, monospace; font-size: 14px; "
+            "color: #1a3a6b; background-color: #ffffff; }"
         )
         l_layout.addWidget(self._log_view)
         layout.addWidget(log_group, stretch=1)
@@ -215,9 +216,9 @@ class DataStreamView(QWidget):
             self._lbl_dropped.setText(str(dropped))
             # 有丢帧时标红提醒
             self._lbl_dropped.setStyleSheet(
-                "font-size: 15px; font-weight: bold; color: #c0392b;"
+                "font-size: 18px; font-weight: bold; color: #c0392b;"
                 if dropped > 0 else
-                "font-size: 15px; font-weight: bold; color: #2c3e50;"
+                "font-size: 18px; font-weight: bold; color: #1976d2;"
             )
 
         # 最新样本表格
