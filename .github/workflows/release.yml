@@ -1,0 +1,167 @@
+name: Multi-Platform Release
+
+# 触发条件：push 以 v 开头的 tag（如 v1.0.0），或手动 workflow_dispatch
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: PsychLabV4-Windows
+            archive_name: PsychLabV4-Windows.zip
+            shell: pwsh
+          - os: ubuntu-latest
+            artifact_name: PsychLabV4-Linux
+            archive_name: PsychLabV4-Linux.tar.gz
+            shell: bash
+          - os: macos-latest
+            artifact_name: PsychLabV4-macOS
+            archive_name: PsychLabV4-macOS.tar.gz
+            shell: bash
+
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+
+    steps:
+      # ── 1. 检出代码 ──
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. 安装 Python ──
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      # ── 3. 安装系统依赖（仅 Linux 需要 OpenGL/X11 库给 PySide6）──
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgl1 \
+            libgl1-mesa-glx \
+            libegl1 \
+            libxkbcommon-x11-0 \
+            libxcb-xinerama0 \
+            libdbus-1-3 \
+            libfontconfig1 \
+            libxrandr2 \
+            libxss1 \
+            libxcursor1 \
+            libxcomposite1 \
+            libasound2 \
+            libxi6 \
+            libxtst6
+
+      # ── 4. 安装 Python 依赖 ──
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller openpyxl
+
+      # ── 5. 准备 config 目录（确保存在）──
+      - name: Ensure config directory exists
+        run: |
+          if (-not (Test-Path "config")) { New-Item -ItemType Directory -Path "config" | Out-Null }
+          if (-not (Test-Path "config/sensors.json")) { Set-Content -Path "config/sensors.json" -Value "[]" }
+        if: runner.os == 'Windows'
+      - name: Ensure config directory exists (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p config
+          [ -f config/sensors.json ] || echo "[]" > config/sensors.json
+
+      # ── 6. 跨平台 PyInstaller 打包 ──
+      # 平台分隔符：Windows ';'，Unix ':'
+      - name: Build with PyInstaller (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --noconfirm --windowed --onefile `
+            --name "PsychLabV4" `
+            --add-data "config;config" `
+            --collect-all neurokit2 `
+            --collect-submodules scipy.signal `
+            --collect-all openpyxl `
+            --hidden-import PySide6.QtWidgets `
+            --hidden-import PySide6.QtCore `
+            --hidden-import PySide6.QtGui `
+            --hidden-import numpy `
+            --hidden-import scipy `
+            --hidden-import h5py `
+            --hidden-import pyqtgraph `
+            --exclude-module PyQt5 `
+            --exclude-module PyQt6 `
+            --exclude-module PySide2 `
+            --exclude-module OpenGL `
+            --exclude-module OpenGL_accel `
+            --exclude-module matplotlib `
+            main.py
+
+      - name: Build with PyInstaller (Linux & macOS)
+        if: runner.os != 'Windows'
+        run: |
+          pyinstaller --noconfirm --windowed --onefile \
+            --name "PsychLabV4" \
+            --add-data "config:config" \
+            --collect-all neurokit2 \
+            --collect-submodules scipy.signal \
+            --collect-all openpyxl \
+            --hidden-import PySide6.QtWidgets \
+            --hidden-import PySide6.QtCore \
+            --hidden-import PySide6.QtGui \
+            --hidden-import numpy \
+            --hidden-import scipy \
+            --hidden-import h5py \
+            --hidden-import pyqtgraph \
+            --exclude-module PyQt5 \
+            --exclude-module PyQt6 \
+            --exclude-module PySide2 \
+            --exclude-module OpenGL \
+            --exclude-module OpenGL_accel \
+            --exclude-module matplotlib \
+            main.py
+
+      # ── 7. 整理产物（Linux/macOS 加可执行权限并打包）──
+      - name: Package artifacts (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Compress-Archive -Path "dist/PsychLabV4.exe" -DestinationPath ${{ matrix.archive_name }}
+
+      - name: Package artifacts (Linux & macOS)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x dist/PsychLabV4
+          tar -czf ${{ matrix.archive_name }} -C dist PsychLabV4
+
+      # ── 8. 上传构建产物（每次构建都可在 Actions 页面下载）──
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.archive_name }}
+          retention-days: 30
+
+      # ── 9. 上传到 Release（仅 tag push 时触发）──
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.archive_name }}
+          name: PsychLab V4 ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
