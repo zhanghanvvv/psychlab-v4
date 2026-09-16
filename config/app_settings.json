@@ -1,0 +1,50 @@
+{
+    "app_name": "PsychLab V4",
+    "version": "1.0.0",
+    "default_sampling_rate": 1000,
+    "supported_sampling_rates": [10, 20, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000],
+    "default_resolution_bits": 16,
+    "max_channels_per_hub": 8,
+    "max_hubs": 3,
+    "default_time_window_sec": 10,
+    "refresh_interval_ms": 50,
+    "ring_buffer_duration_sec": 30,
+    "data_dir": "data",
+    "continuous_mode": true,
+    "max_recording_hours": 10,
+    "channel_colors": {
+        "1": "#e74c3c",
+        "2": "#2ecc71",
+        "3": "#3498db",
+        "4": "#f39c12",
+        "5": "#9b59b6",
+        "6": "#1abc9c",
+        "7": "#e67e22",
+        "8": "#95a5a6"
+    },
+    "sensor_defaults": {
+        "ECG": {"filter_low": 0.5, "filter_high": 40.0, "notch": 50.0, "unit": "mV", "yrange": [-2, 2]},
+        "EMG": {"filter_low": 20.0, "filter_high": 500.0, "notch": 50.0, "unit": "mV", "yrange": [-1, 1]},
+        "EEG": {"filter_low": 0.5, "filter_high": 50.0, "notch": 50.0, "unit": "uV", "yrange": [-100, 100]},
+        "EDA": {"filter_low": 0.5, "filter_high": 5.0, "notch": null, "unit": "uS", "yrange": [0, 20]},
+        "BVP": {"filter_low": 0.5, "filter_high": 10.0, "notch": null, "unit": "mV", "yrange": [-1, 1]},
+        "RESP": {"filter_low": 0.1, "filter_high": 2.0, "notch": null, "unit": "%", "yrange": [-50, 50]},
+        "TEMP": {"filter_low": null, "filter_high": null, "notch": null, "unit": "C", "yrange": [20, 40]},
+        "OXIMETER": {"filter_low": null, "filter_high": null, "notch": null, "unit": "%", "yrange": [80, 100]},
+        "EOG": {"filter_low": 0.5, "filter_high": 30.0, "notch": 50.0, "unit": "mV", "yrange": [-1, 1]},
+        "EGG": {"filter_low": 0.5, "filter_high": 30.0, "notch": 50.0, "unit": "mV", "yrange": [-1, 1]}
+    },
+    "flight_tasks": {
+        "1":  {"name": "静息状态数据采集",       "short": "REST",     "has_phases": true},
+        "2":  {"name": "飞机开车任务",            "short": "START",    "has_phases": false},
+        "3":  {"name": "起飞至平飞",              "short": "TKOFF",    "has_phases": false},
+        "4":  {"name": "平飞转上升",              "short": "CLIMB",    "has_phases": false},
+        "5":  {"name": "平飞转下滑",              "short": "DESC",     "has_phases": false},
+        "6":  {"name": "平飞转弯",                "short": "TURN",     "has_phases": false},
+        "7":  {"name": "特情飞行",                "short": "EMER",     "has_phases": false},
+        "8":  {"name": "平飞横滚",                "short": "ROLL",     "has_phases": false},
+        "9":  {"name": "寻迹飞行",                "short": "TRACK",    "has_phases": false},
+        "10": {"name": "空中目标(如桥梁)趋近",    "short": "TARGET",   "has_phases": false},
+        "11": {"name": "五边飞行至降落",          "short": "LAND",     "has_phases": false}
+    }
+}

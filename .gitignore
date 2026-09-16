@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.venv/
+venv/
+env/
+
+# PyInstaller
+build/
+dist/
+*.spec.bak
+
+# 运行时生成的目录
+data/
+logs/
+config/sensors.json
+
+# IDE
+.trae/
+.idea/
+.vscode/
+*.swp
+
+# 操作系统
+Thumbs.db
+.DS_Store
+
+# 临时文件
+*.tmp
+*_test_analysis.py
