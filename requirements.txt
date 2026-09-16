@@ -4,4 +4,6 @@ numpy>=1.24.0
 scipy>=1.11.0
 neurokit2>=0.2.0
 h5py>=3.10.0
+openpyxl>=3.1.0
+# pylsl 为可选依赖（LSL 数据源），CI 中可能跳过安装
 pylsl>=1.16.0
