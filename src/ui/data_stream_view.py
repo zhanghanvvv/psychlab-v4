@@ -2,7 +2,7 @@
 
 不绘制波形，以文本/数值方式实时显示：
 - 最新样本数值（每通道最近若干帧原始值）
-- 实时帧率 / 标称采样率 / 丢帧数
+- 实时帧率 / 标称采样率
 - 累计帧数 / 已采集时长
 - 运行状态日志
 
@@ -129,12 +129,11 @@ class DataStreamView(QWidget):
         self._lbl_frames = QLabel("0")
         self._lbl_fps = QLabel("--")
         self._lbl_nominal = QLabel("--")
-        self._lbl_dropped = QLabel("0")
         self._lbl_channels = QLabel("0")
 
         big = "font-size: 18px; font-weight: bold; color: #1976d2;"
         for lbl in (self._lbl_elapsed, self._lbl_frames, self._lbl_fps,
-                    self._lbl_nominal, self._lbl_dropped, self._lbl_channels):
+                    self._lbl_nominal, self._lbl_channels):
             lbl.setStyleSheet(big)
 
         items = [
@@ -142,7 +141,6 @@ class DataStreamView(QWidget):
             ("累计帧数", self._lbl_frames),
             ("实时帧率(fps)", self._lbl_fps),
             ("标称采样率(Hz)", self._lbl_nominal),
-            ("丢帧数", self._lbl_dropped),
             ("启用通道", self._lbl_channels),
         ]
         for col, (title, value) in enumerate(items):
@@ -212,14 +210,6 @@ class DataStreamView(QWidget):
             self._lbl_elapsed.setText(self._fmt_duration(snap["elapsed"]))
             self._lbl_frames.setText(f"{snap['frame_count']:,}")
             self._lbl_fps.setText(f"{snap['fps']:.0f}")
-            dropped = snap["dropped"]
-            self._lbl_dropped.setText(str(dropped))
-            # 有丢帧时标红提醒
-            self._lbl_dropped.setStyleSheet(
-                "font-size: 18px; font-weight: bold; color: #c0392b;"
-                if dropped > 0 else
-                "font-size: 18px; font-weight: bold; color: #1976d2;"
-            )
 
         # 最新样本表格
         latest = snap["latest"]
