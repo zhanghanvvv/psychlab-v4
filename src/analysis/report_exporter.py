@@ -185,7 +185,7 @@ def export_report(
 
         # ── Sheet 1: 汇总 ──
         ws_summary = wb.create_sheet("汇总")
-        ws_summary["A1"] = "PsychLab V4 分析报告"
+        ws_summary["A1"] = "PsychLab V6 分析报告"
         ws_summary["A1"].font = title_font
         ws_summary["A2"] = f"生成时间: {recording.start_time}"
         ws_summary["A3"] = f"采集设备: {recording.device_address}"

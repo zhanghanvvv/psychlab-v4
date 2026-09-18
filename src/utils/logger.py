@@ -1,4 +1,4 @@
-"""日志模块，统一管理 PsychLab V4 的日志输出。"""
+"""日志模块，统一管理 PsychLab V6 的日志输出。"""
 
 import logging
 import sys

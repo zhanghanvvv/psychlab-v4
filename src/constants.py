@@ -1,4 +1,4 @@
-"""PsychLab V4 全局常量定义。
+"""PsychLab V6 全局常量定义。
 
 传感器类型枚举与 PLUX Python API 一致，
 通道掩码、最大采样率等硬件约束来自 PLUX 官方文档。

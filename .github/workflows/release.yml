@@ -20,16 +20,16 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact_name: PsychLabV4-Windows
-            archive_name: PsychLabV4-Windows.zip
+            artifact_name: PsychLabV6-Windows
+            archive_name: PsychLabV6-Windows.zip
             shell: pwsh
           - os: ubuntu-latest
-            artifact_name: PsychLabV4-Linux
-            archive_name: PsychLabV4-Linux.tar.gz
+            artifact_name: PsychLabV6-Linux
+            archive_name: PsychLabV6-Linux.tar.gz
             shell: bash
           - os: macos-latest
-            artifact_name: PsychLabV4-macOS
-            archive_name: PsychLabV4-macOS.tar.gz
+            artifact_name: PsychLabV6-macOS
+            archive_name: PsychLabV6-macOS.tar.gz
             shell: bash
 
     defaults:
@@ -98,7 +98,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           pyinstaller --noconfirm --windowed --onefile `
-            --name "PsychLabV4" `
+            --name "PsychLabV6" `
             --add-data "config;config" `
             --collect-all neurokit2 `
             --collect-submodules scipy.signal `
@@ -123,7 +123,7 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           pyinstaller --noconfirm --windowed --onefile \
-            --name "PsychLabV4" \
+            --name "PsychLabV6" \
             --add-data "config:config" \
             --collect-all neurokit2 \
             --collect-submodules scipy.signal \
@@ -148,13 +148,13 @@ jobs:
       - name: Package artifacts (Windows)
         if: runner.os == 'Windows'
         run: |
-          Compress-Archive -Path "dist/PsychLabV4.exe" -DestinationPath ${{ matrix.archive_name }}
+          Compress-Archive -Path "dist/PsychLabV6.exe" -DestinationPath ${{ matrix.archive_name }}
 
       - name: Package artifacts (Linux & macOS)
         if: runner.os != 'Windows'
         run: |
-          chmod +x dist/PsychLabV4
-          tar -czf ${{ matrix.archive_name }} -C dist PsychLabV4
+          chmod +x dist/PsychLabV6
+          tar -czf ${{ matrix.archive_name }} -C dist PsychLabV6
 
       # ── 8. 上传构建产物（每次构建都可在 Actions 页面下载）──
       - name: Upload artifact
@@ -170,7 +170,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ matrix.archive_name }}
-          name: PsychLab V4 ${{ github.ref_name }}
+          name: PsychLab V6 ${{ github.ref_name }}
           draft: false
           prerelease: false
         env:

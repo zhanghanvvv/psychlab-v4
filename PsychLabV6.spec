@@ -33,7 +33,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='PsychLabV4',
+    name='PsychLabV6',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

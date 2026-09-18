@@ -1,4 +1,4 @@
-"""PsychLab V4 主入口。
+"""PsychLab V6 主入口。
 
 生理信号采集分析系统，用于 biosignalsplux 设备数据采集与分析。
 模拟飞行系统全程生理数据采集与事件标记。
@@ -20,9 +20,9 @@ from src.utils.logger import logger
 
 
 def main():
-    """启动 PsychLab V4。"""
+    """启动 PsychLab V6。"""
     logger.info("=" * 50)
-    logger.info("PsychLab V4 启动中...")
+    logger.info("PsychLab V6 启动中...")
     logger.info("=" * 50)
 
     # 高DPI支持
@@ -31,7 +31,7 @@ def main():
     )
 
     app = QApplication(sys.argv)
-    app.setApplicationName("PsychLab V4")
+    app.setApplicationName("PsychLab V6")
     app.setOrganizationName("PsychLab")
 
     # 设置应用样式
@@ -252,12 +252,12 @@ def main():
     window = MainWindow()
     window.show()
 
-    logger.info("PsychLab V4 已启动")
+    logger.info("PsychLab V6 已启动")
 
     # 运行事件循环
     ret = app.exec()
 
-    logger.info("PsychLab V4 已退出")
+    logger.info("PsychLab V6 已退出")
     sys.exit(ret)
 
 

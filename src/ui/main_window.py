@@ -1,4 +1,4 @@
-"""PsychLab V4 主窗口。
+"""PsychLab V6 主窗口。
 
 整合设备面板、数据流监控、实验阶段控制、离线分析。
 管理采集生命周期：设备连接 → 三态阶段切换 → 数据采集 → 存储 → 分析。
@@ -32,11 +32,11 @@ from ..utils.logger import logger
 
 
 class MainWindow(QMainWindow):
-    """PsychLab V4 主窗口。"""
+    """PsychLab V6 主窗口。"""
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PsychLab V4 - 生理信号采集分析系统")
+        self.setWindowTitle("PsychLab V6 - 生理信号采集分析系统")
         self.setMinimumSize(1280, 800)
 
         self._config = ConfigManager()
@@ -132,21 +132,13 @@ class MainWindow(QMainWindow):
         open_action = file_menu.addAction("打开数据文件...")
         open_action.triggered.connect(self._on_open_file)
 
-        export_action = file_menu.addAction("导出数据...")
-        file_menu.addAction(export_action)
-
         file_menu.addSeparator()
         exit_action = file_menu.addAction("退出")
         exit_action.triggered.connect(self.close)
 
-        # 设置菜单
-        settings_menu = menubar.addMenu("设置")
-        settings_menu.addAction("设备配置...")
-        settings_menu.addAction("滤波配置...")
-
         # 帮助菜单
         help_menu = menubar.addMenu("帮助")
-        about_action = help_menu.addAction("关于 PsychLab V4")
+        about_action = help_menu.addAction("关于 PsychLab V6")
         about_action.triggered.connect(self._on_about)
 
     def _init_status_bar(self):
@@ -473,8 +465,8 @@ class MainWindow(QMainWindow):
 
         mode = "真实设备模式" if _plux_available else "模拟设备模式"
         QMessageBox.about(
-            self, "关于 PsychLab V4",
-            f"<h2>PsychLab V4</h2>"
+            self, "关于 PsychLab V6",
+            f"<h2>PsychLab V6</h2>"
             f"<p>生理信号采集分析系统</p>"
             f"<p>版本: {self._config.get('version', '1.0.0')}</p>"
             f"<p>运行模式: {mode}</p>"
